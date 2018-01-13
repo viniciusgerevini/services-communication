@@ -3,6 +3,7 @@ import MessageBus from './messagebus';
 
 let messageBus = null;
 let httpClientStub = null;
+let eventSourceClientStub = null;
 const MESSAGE_BUS_HOST = 'http://test.com';
 
 test.beforeEach(() => {
@@ -12,7 +13,18 @@ test.beforeEach(() => {
     }
   };
 
-  messageBus = new MessageBus(MESSAGE_BUS_HOST, httpClientStub);
+  eventSourceClientStub = {};
+
+  const eventSourceClientConstructorStub = function (host) {
+    eventSourceClientStub.host = host;
+    return eventSourceClientStub;
+  };
+
+  messageBus = new MessageBus(MESSAGE_BUS_HOST, httpClientStub, eventSourceClientConstructorStub);
+});
+
+test('listen to stream', (t) => {
+  t.is(eventSourceClientStub.host, `${MESSAGE_BUS_HOST}/sub`);
 });
 
 test('publish message', (t) => {
@@ -27,9 +39,22 @@ test('publish message', (t) => {
     url: `${MESSAGE_BUS_HOST}/pub`,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-EventSource-Event': message.name
+      'Content-Type': 'application/json'
     },
     form: message
   });
+});
+
+test('subscribe to message', (t) => {
+  t.plan(1);
+
+  const expectedMessage = { name: 'test-message', data: 'something' };
+  const notExpectedMessage = { name: 'another-message', data: 'something else' };
+
+  messageBus.subscribe('test-message', (message) => {
+    t.deepEqual(message, expectedMessage);
+  });
+
+  eventSourceClientStub.onmessage(expectedMessage);
+  eventSourceClientStub.onmessage(notExpectedMessage);
 });
