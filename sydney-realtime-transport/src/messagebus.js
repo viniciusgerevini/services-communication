@@ -7,8 +7,9 @@ function MessageBus(
   let listeners = {};
 
   eventSource.onmessage = (message) => {
-    if (listeners[message.name])  {
-      listeners[message.name](message);
+    const data = JSON.parse(message.data);
+    if (listeners[data.name])  {
+      listeners[data.name](data);
     }
   };
 
@@ -19,7 +20,7 @@ function MessageBus(
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      form: message
+      form: JSON.stringify(message)
     });
   }
 

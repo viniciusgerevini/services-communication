@@ -41,7 +41,7 @@ test('publish message', (t) => {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
-    form: message
+    form: JSON.stringify(message)
   });
 });
 
@@ -55,8 +55,8 @@ test('subscribe to message', (t) => {
     t.deepEqual(message, expectedMessage);
   });
 
-  eventSourceClientStub.onmessage(expectedMessage);
-  eventSourceClientStub.onmessage(notExpectedMessage);
+  eventSourceClientStub.onmessage({ data: JSON.stringify(expectedMessage) });
+  eventSourceClientStub.onmessage({ data: JSON.stringify(notExpectedMessage) });
 });
 
 test('subscribe to multiple messages', (t) => {
@@ -73,6 +73,6 @@ test('subscribe to multiple messages', (t) => {
     t.deepEqual(message, expectedMessage2);
   });
 
-  eventSourceClientStub.onmessage(expectedMessage);
-  eventSourceClientStub.onmessage(expectedMessage2);
+  eventSourceClientStub.onmessage({ data: JSON.stringify(expectedMessage) });
+  eventSourceClientStub.onmessage({ data: JSON.stringify(expectedMessage2) });
 });
