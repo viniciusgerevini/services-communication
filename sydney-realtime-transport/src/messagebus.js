@@ -4,6 +4,13 @@ function MessageBus(
   EventSource = require('eventsource')
 ) {
   const eventSource = new EventSource(`${host}/sub`);
+  let listeners = {};
+
+  eventSource.onmessage = (message) => {
+    if (listeners[message.name])  {
+      listeners[message.name](message);
+    }
+  };
 
   function publish(message) {
     httpClient.post({
@@ -17,11 +24,7 @@ function MessageBus(
   }
 
   function subscribe(messageType, callback) {
-    eventSource.onmessage = (message) => {
-      if (messageType == message.name)  {
-        callback(message);
-      }
-    };
+    listeners[messageType] = callback;
   }
 
   return { publish, subscribe }

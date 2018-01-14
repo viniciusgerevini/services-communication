@@ -58,3 +58,21 @@ test('subscribe to message', (t) => {
   eventSourceClientStub.onmessage(expectedMessage);
   eventSourceClientStub.onmessage(notExpectedMessage);
 });
+
+test('subscribe to multiple messages', (t) => {
+  t.plan(2);
+
+  const expectedMessage = { name: 'test-message', data: 'something' };
+  const expectedMessage2 = { name: 'another-message', data: 'something else' };
+
+  messageBus.subscribe('test-message', (message) => {
+    t.deepEqual(message, expectedMessage);
+  });
+
+  messageBus.subscribe('another-message', (message) => {
+    t.deepEqual(message, expectedMessage2);
+  });
+
+  eventSourceClientStub.onmessage(expectedMessage);
+  eventSourceClientStub.onmessage(expectedMessage2);
+});
