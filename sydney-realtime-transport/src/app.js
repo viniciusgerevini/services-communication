@@ -1,4 +1,4 @@
-const TEN_MINUTES_IN_MS = 600000;
+const FIVE_MINUTES_IN_MS = 300000;
 
 function App(messageBus, updater, date = Date, timeout = setTimeout) {
   let timeSinceLastMessage;
@@ -17,11 +17,16 @@ function App(messageBus, updater, date = Date, timeout = setTimeout) {
     });
   });
 
-  timeout(() => {
-    if (date.now() - timeSinceLastMessage > TEN_MINUTES_IN_MS) {
-      updater.stop();
-    }
-  });
+  function stopIfMaxIntervalReached() {
+    timeout(() => {
+      if (date.now() - timeSinceLastMessage > FIVE_MINUTES_IN_MS) {
+        updater.stop();
+      }
+      stopIfMaxIntervalReached(updater, date, timeout, timeSinceLastMessage);
+    }, FIVE_MINUTES_IN_MS);
+  }
+
+  stopIfMaxIntervalReached(updater, date, timeout, timeSinceLastMessage);
 }
 
 module.exports = App;

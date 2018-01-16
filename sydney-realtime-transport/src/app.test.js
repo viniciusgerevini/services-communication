@@ -6,7 +6,9 @@ import updaterFake from './test-helpers/updater-fake';
 import dateFake from './test-helpers/date-fake';
 
 let timeoutCallback = null;
+let timeoutScheduleCount = 0;
 const setTimeoutFake = (callback) => {
+  timeoutScheduleCount += 1;
   timeoutCallback = callback;
 };
 
@@ -16,6 +18,7 @@ test.beforeEach(() => {
   dateFake.reset();
 
   timeoutCallback = null;
+  timeoutScheduleCount = 0;
 });
 
 
@@ -56,9 +59,10 @@ test('DO NOT start update when updates for another city requested', (t) => {
 test('stop updates after 10 minutes without receiving messages', (t) => {
   t.plan(1);
 
-  const TEN_MINUTES_IN_MS = 600000;
+  const FIVE_MINUTES_IN_MS = 300000;
 
   updaterFake.onStop = () => {
+		console.log('called');
     t.pass();
   };
 
@@ -67,8 +71,15 @@ test('stop updates after 10 minutes without receiving messages', (t) => {
   messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 
   timeoutCallback();
-  dateFake.date += TEN_MINUTES_IN_MS + 1;
+  dateFake.date += FIVE_MINUTES_IN_MS + 1;
   timeoutCallback();
+});
+
+test('message heartbeat check is scheduled again after check', (t) => {
+  App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
+  t.is(timeoutScheduleCount, 1);
+  timeoutCallback();
+  t.is(timeoutScheduleCount, 2);
 });
 
 test('publish message when data updated', (t) => {
