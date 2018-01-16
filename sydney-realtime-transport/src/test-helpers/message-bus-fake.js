@@ -2,7 +2,7 @@ const messageBusFake = {
   listeners: {},
   lastPublishedMessage: null,
   publish(message) {
-    lastPublishedMessage = message;
+    this.lastPublishedMessage = message;
   },
   subscribe(message, callback) {
     this.listeners[message] = callback;

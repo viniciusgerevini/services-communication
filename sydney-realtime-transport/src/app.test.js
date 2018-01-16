@@ -5,18 +5,17 @@ import messageBusFake from './test-helpers/message-bus-fake';
 import updaterFake from './test-helpers/updater-fake';
 import dateFake from './test-helpers/date-fake';
 
+let timeoutCallback = null;
 const setTimeoutFake = (callback) => {
   timeoutCallback = callback;
 };
-
-let timeoutCallback = null;
 
 test.beforeEach(() => {
   messageBusFake.reset();
   updaterFake.reset();
   dateFake.reset();
 
-  timeoutCallback = null
+  timeoutCallback = null;
 });
 
 
@@ -31,10 +30,10 @@ test('start update when updates for Sydney requested', (t) => {
     t.fail('should not stop updater');
   };
 
-  const app = new App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } }
+  App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
 
-  messageBusFake.listeners['TRANSPORT_LIVE_POSITION_REQUESTED'](message);
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 });
 
 test('DO NOT start update when updates for another city requested', (t) => {
@@ -48,10 +47,10 @@ test('DO NOT start update when updates for another city requested', (t) => {
     t.fail('should not stop updater');
   };
 
-  const app = new App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Melbourne' } }
+  App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
 
-  messageBusFake.listeners['TRANSPORT_LIVE_POSITION_REQUESTED'](message);
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Melbourne' } };
+  messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 });
 
 test('stop updates after 10 minutes without receiving messages', (t) => {
@@ -63,9 +62,9 @@ test('stop updates after 10 minutes without receiving messages', (t) => {
     t.pass();
   };
 
-  const app = new App(messageBusFake, updaterFake, dateFake, setTimeoutFake)
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } }
-  messageBusFake.listeners['TRANSPORT_LIVE_POSITION_REQUESTED'](message);
+  App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 
   timeoutCallback();
   dateFake.date += TEN_MINUTES_IN_MS + 1;
