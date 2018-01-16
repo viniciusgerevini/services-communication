@@ -35,7 +35,7 @@ test('start update when updates for Sydney requested', (t) => {
 
   App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
 
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_SYDNEY' } };
   messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 });
 
@@ -52,7 +52,7 @@ test('DO NOT start update when updates for another city requested', (t) => {
 
   App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
 
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Melbourne' } };
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_MELBOURNE' } };
   messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 });
 
@@ -67,7 +67,7 @@ test('stop updates after 10 minutes without receiving messages', (t) => {
   };
 
   App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_SYDNEY' } };
   messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 
   timeoutCallback();
@@ -84,7 +84,7 @@ test('message heartbeat check is scheduled again after check', (t) => {
 
 test('publish message when data updated', (t) => {
   App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
-  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_SYDNEY' } };
   messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
 
   const updateData = { some: 'data' };

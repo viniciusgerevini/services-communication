@@ -4,7 +4,7 @@ function App(messageBus, updater, date = Date, timeout = setTimeout) {
   let timeSinceLastMessage;
 
   messageBus.subscribe('TRANSPORT_LIVE_POSITION_REQUESTED', (message) => {
-    if (message.data.city === 'AU_Sydney') {
+    if (message.data.city === 'AU_SYDNEY') {
       updater.start();
       timeSinceLastMessage = date.now();
     }
