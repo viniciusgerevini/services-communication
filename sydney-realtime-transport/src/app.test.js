@@ -70,3 +70,18 @@ test('stop updates after 10 minutes without receiving messages', (t) => {
   dateFake.date += TEN_MINUTES_IN_MS + 1;
   timeoutCallback();
 });
+
+test('publish message when data updated', (t) => {
+  App(messageBusFake, updaterFake, dateFake, setTimeoutFake);
+  const message = { name: 'TRANSPORT_LIVE_POSITION_REQUESTED', data: { city: 'AU_Sydney' } };
+  messageBusFake.listeners.TRANSPORT_LIVE_POSITION_REQUESTED(message);
+
+  const updateData = { some: 'data' };
+
+  updaterFake.onUpdateCallback(updateData);
+
+  t.deepEqual(messageBusFake.lastPublishedMessage, {
+    name: 'TRANSPORT_LIVE_POSITION_UPDATED',
+    data: updateData
+  });
+});

@@ -10,6 +10,13 @@ function App(messageBus, updater, date = Date, timeout = setTimeout) {
     }
   });
 
+  updater.onUpdate((data) => {
+    messageBus.publish({
+      name: 'TRANSPORT_LIVE_POSITION_UPDATED',
+      data
+    });
+  });
+
   timeout(() => {
     if (date.now() - timeSinceLastMessage > TEN_MINUTES_IN_MS) {
       updater.stop();
