@@ -22,11 +22,11 @@ function App(messageBus, updater, date = Date, timeout = setTimeout) {
       if (date.now() - timeSinceLastMessage > FIVE_MINUTES_IN_MS) {
         updater.stop();
       }
-      stopIfMaxIntervalReached(updater, date, timeout, timeSinceLastMessage);
+      stopIfMaxIntervalReached();
     }, FIVE_MINUTES_IN_MS);
   }
 
-  stopIfMaxIntervalReached(updater, date, timeout, timeSinceLastMessage);
+  stopIfMaxIntervalReached();
 }
 
 module.exports = App;
