@@ -62,7 +62,6 @@ test('stop updates after 10 minutes without receiving messages', (t) => {
   const FIVE_MINUTES_IN_MS = 300000;
 
   updaterFake.onStop = () => {
-		console.log('called');
     t.pass();
   };
 
