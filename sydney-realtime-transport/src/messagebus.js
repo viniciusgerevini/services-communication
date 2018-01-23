@@ -6,15 +6,19 @@ function MessageBus(
   httpClient = request,
   EventSource = eventsource
 ) {
-  const eventSource = new EventSource(`${host}/sub`);
   const listeners = {};
 
-  eventSource.onmessage = (message) => {
+  function onMessageReceived(message) {
     const data = JSON.parse(message.data);
     if (listeners[data.name]) {
       listeners[data.name](data);
     }
-  };
+  }
+
+  function connect() {
+    const eventSource = new EventSource(`${host}/sub`);
+    eventSource.onmessage = onMessageReceived;
+  }
 
   function publish(message) {
     httpClient.post({
@@ -31,7 +35,7 @@ function MessageBus(
     listeners[messageType] = callback;
   }
 
-  return { publish, subscribe };
+  return { publish, subscribe, connect };
 }
 
 module.exports = MessageBus;

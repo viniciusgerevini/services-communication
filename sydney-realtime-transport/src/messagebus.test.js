@@ -21,9 +21,10 @@ test.beforeEach(() => {
   };
 
   messageBus = new MessageBus(MESSAGE_BUS_HOST, httpClientStub, eventSourceClientConstructorStub);
+  messageBus.connect();
 });
 
-test('listen to stream', (t) => {
+test('connect to stream', (t) => {
   t.is(eventSourceClientStub.host, `${MESSAGE_BUS_HOST}/sub`);
 });
 
