@@ -77,3 +77,13 @@ test('subscribe to multiple messages', (t) => {
   eventSourceClientStub.onmessage({ data: JSON.stringify(expectedMessage) });
   eventSourceClientStub.onmessage({ data: JSON.stringify(expectedMessage2) });
 });
+
+test('notify connection errors', (t) => {
+  const expectedError = new Error('connection error');
+
+  messageBus.onError((error) => {
+    t.deepEqual(error, expectedError);
+  });
+
+  eventSourceClientStub.onerror(expectedError);
+});
