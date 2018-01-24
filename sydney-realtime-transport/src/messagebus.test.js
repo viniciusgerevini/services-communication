@@ -8,8 +8,17 @@ const MESSAGE_BUS_HOST = 'http://test.com';
 
 test.beforeEach(() => {
   httpClientStub = {
-    post(request) {
+    post(request, callback) {
       this.lastRequest = request;
+      this.onNextRequest(request);
+      setTimeout(() => {
+        callback(this.error);
+        this.error = null;
+      });
+    },
+    onNextRequest() {},
+    fail(error) {
+      this.error = error;
     }
   };
 
@@ -28,22 +37,38 @@ test('connect to stream', (t) => {
   t.is(eventSourceClientStub.host, `${MESSAGE_BUS_HOST}/sub`);
 });
 
-test('publish message', (t) => {
+test('publish message', async (t) => {
   const message = {
     name: 'test',
     data: { something: 'here' }
   };
 
-  messageBus.publish(message);
+  httpClientStub.onNextRequest = (request) => {
+    t.deepEqual(request, {
+      url: `${MESSAGE_BUS_HOST}/pub`,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      form: JSON.stringify(message)
+    });
+  };
 
-  t.deepEqual(httpClientStub.lastRequest, {
-    url: `${MESSAGE_BUS_HOST}/pub`,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    form: JSON.stringify(message)
-  });
+  await messageBus.publish(message);
+});
+
+test('return error when publish fails', async (t) => {
+  t.plan(1);
+
+  const expectedError = new Error('something');
+  const message = {};
+
+  httpClientStub.fail(expectedError);
+
+  await messageBus.publish(message)
+    .catch((error) => {
+      t.deepEqual(expectedError, error);
+    });
 });
 
 test('subscribe to message', (t) => {
@@ -86,4 +111,12 @@ test('notify connection errors', (t) => {
   });
 
   eventSourceClientStub.onerror(expectedError);
+});
+
+test('notify connection open', (t) => {
+  messageBus.onConnect(() => {
+    t.pass();
+  });
+
+  eventSourceClientStub.onopen();
 });

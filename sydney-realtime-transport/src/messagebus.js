@@ -8,6 +8,7 @@ function MessageBus(
 ) {
   const listeners = {};
   const errorListeners = [];
+  const connectionListeners = [];
 
   function onMessageReceived(message) {
     const data = JSON.parse(message.data);
@@ -22,20 +23,35 @@ function MessageBus(
     });
   }
 
+  function onConnectionOpen() {
+    connectionListeners.forEach((listener) => {
+      listener();
+    });
+  }
+
   function connect() {
     const eventSource = new EventSource(`${host}/sub`);
     eventSource.onmessage = onMessageReceived;
     eventSource.onerror = onConnectionError;
+    eventSource.onopen = onConnectionOpen;
   }
 
   function publish(message) {
-    httpClient.post({
-      url: `${host}/pub`,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      form: JSON.stringify(message)
+    return new Promise((resolve, reject) => {
+      httpClient.post({
+        url: `${host}/pub`,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        form: JSON.stringify(message)
+      }, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
     });
   }
 
@@ -47,11 +63,16 @@ function MessageBus(
     errorListeners.push(callback);
   }
 
+  function onConnect(callback) {
+    connectionListeners.push(callback);
+  }
+
   return {
     publish,
     subscribe,
     connect,
-    onError
+    onError,
+    onConnect
   };
 }
 
