@@ -3,7 +3,13 @@ function Updater(action, options, interval = setInterval, stopInterval = clearIn
   let onUpdateCallback = () => {};
 
   async function executeAction() {
-    onUpdateCallback(await action());
+    const response = await action();
+
+    if (response && response.length >= 0) {
+      response.forEach(onUpdateCallback);
+    } else {
+      onUpdateCallback(response);
+    }
   }
 
   return {

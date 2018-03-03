@@ -71,7 +71,7 @@ test.cb('trigger onUpdate every execution', (t) => {
     action = _action;
   };
 
-  const fakeAction = () => {};
+  const fakeAction = () => Promise.resolve({});
 
   const updater = Updater(fakeAction, options, fakeInterval);
 
@@ -88,6 +88,30 @@ test.cb('trigger onUpdate every execution', (t) => {
   action();
   action();
   action();
+});
+
+test.cb('trigger onUpdate for each item received', (t) => {
+  t.plan(3);
+  let numberOfUpdatesTriggered = 0;
+  const options = {};
+  const fakeInterval = () => {};
+  const response = ['data1', 'data2', 'data3'];
+
+
+  const fakeAction = () => Promise.resolve(response);
+
+  const updater = Updater(fakeAction, options, fakeInterval);
+
+  updater.onUpdate((data) => {
+    t.is(data, response[numberOfUpdatesTriggered]);
+
+    if (numberOfUpdatesTriggered === 2) {
+      t.end();
+    }
+    numberOfUpdatesTriggered += 1;
+  });
+
+  updater.start();
 });
 
 test.cb('returned data is passed to onUpdate callback', (t) => {
