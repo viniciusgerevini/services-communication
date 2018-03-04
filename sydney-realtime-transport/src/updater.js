@@ -1,9 +1,17 @@
 function Updater(action, options, interval = setInterval, stopInterval = clearInterval) {
   let intervalId;
   let onUpdateCallback = () => {};
+  let onError = () => {};
 
   async function executeAction() {
-    const response = await action();
+    let response;
+
+    try {
+      response = await action();
+    } catch (err) {
+      onError(err);
+      return;
+    }
 
     if (response && response.length >= 0) {
       response.forEach(onUpdateCallback);
@@ -22,6 +30,9 @@ function Updater(action, options, interval = setInterval, stopInterval = clearIn
     },
     onUpdate(callback) {
       onUpdateCallback = callback;
+    },
+    onError(callback) {
+      onError = callback;
     }
   };
 }

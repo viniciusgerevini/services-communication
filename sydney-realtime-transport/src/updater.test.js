@@ -131,3 +131,26 @@ test.cb('returned data is passed to onUpdate callback', (t) => {
 
   updater.start();
 });
+
+test.cb('trigger onError when execution fails', (t) => {
+  t.plan(1);
+  const options = {};
+
+  let action = null;
+  const fakeInterval = (_action) => {
+    action = _action;
+  };
+
+  const expectedError = new Error('something went wrong');
+
+  const fakeAction = () => Promise.reject(expectedError);
+
+  const updater = Updater(fakeAction, options, fakeInterval);
+
+  updater.onError((err) => {
+    t.deepEqual(err, expectedError);
+    t.end();
+  });
+
+  updater.start();
+});
