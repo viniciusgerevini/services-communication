@@ -1,9 +1,16 @@
-module.exports = function feedResponseParser(decodeGtfsMessage) {
+function feedResponseParser(decodeGtfsMessage) {
   return function parseGtfsMessage(body) {
     const feed = decodeGtfsMessage(body);
-    return feed.entity.map(parseEntity);
+    return feed.entity.reduce(parseValidEntities, []);
   };
-};
+}
+
+function parseValidEntities(acc, entity) {
+  if (entity.vehicle && entity.vehicle.position) {
+    acc.push(parseEntity(entity));
+  }
+  return acc;
+}
 
 function parseEntity(feed) {
   return {
@@ -18,3 +25,4 @@ function parseEntity(feed) {
   };
 }
 
+module.exports = feedResponseParser;
