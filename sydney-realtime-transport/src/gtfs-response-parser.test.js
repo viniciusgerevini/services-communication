@@ -22,8 +22,11 @@ test('parse bus object', (t) => {
       }
     }
   };
+  const feed = {
+    entity: [feedObject]
+  };
 
-  const expected = {
+  const expected = [{
     id: feedObject.id,
     type: 'bus',
     trip_id: feedObject.vehicle.trip.trip_id,
@@ -32,7 +35,7 @@ test('parse bus object', (t) => {
       latitude: feedObject.vehicle.position.latitude,
       longitude: feedObject.vehicle.position.longitude
     }
-  };
+  }];
 
-  t.deepEqual(parser(feedObject), expected);
+  t.deepEqual(parser(feed), expected);
 });
