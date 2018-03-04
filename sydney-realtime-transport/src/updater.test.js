@@ -136,10 +136,7 @@ test.cb('trigger onError when execution fails', (t) => {
   t.plan(1);
   const options = {};
 
-  let action = null;
-  const fakeInterval = (_action) => {
-    action = _action;
-  };
+  const fakeInterval = () => {};
 
   const expectedError = new Error('something went wrong');
 
@@ -153,4 +150,69 @@ test.cb('trigger onError when execution fails', (t) => {
   });
 
   updater.start();
+});
+
+test.cb('able to register multiple onUpdate callbacks', (t) => {
+  t.plan(2);
+  const options = {};
+  const actionData = { some: 'data' };
+
+  const fakeInterval = () => {};
+
+  const fakeAction = () => Promise.resolve(actionData);
+
+  const updater = Updater(fakeAction, options, fakeInterval);
+
+  updater.onUpdate((data) => {
+    t.deepEqual(data, actionData);
+    end();
+  });
+
+  updater.onUpdate((data) => {
+    t.deepEqual(data, actionData);
+    end();
+  });
+
+  let calls = 0;
+  function end() {
+    calls += 1;
+    if (calls === 2) {
+      t.end();
+    }
+  }
+
+  updater.start();
+});
+
+test.cb('able to register multiple onError callbacks', (t) => {
+  t.plan(2);
+  const options = {};
+
+  const fakeInterval = () => {};
+
+  const expectedError = new Error('something went wrong');
+
+  const fakeAction = () => Promise.reject(expectedError);
+
+  const updater = Updater(fakeAction, options, fakeInterval);
+
+  updater.onError((err) => {
+    t.deepEqual(err, expectedError);
+    end();
+  });
+
+  updater.onError((err) => {
+    t.deepEqual(err, expectedError);
+    end();
+  });
+
+  updater.start();
+
+  let calls = 0;
+  function end() {
+    calls += 1;
+    if (calls === 2) {
+      t.end();
+    }
+  }
 });

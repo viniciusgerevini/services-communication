@@ -1,7 +1,7 @@
 function Updater(action, options, interval = setInterval, stopInterval = clearInterval) {
   let intervalId;
-  let onUpdateCallback = () => {};
-  let onError = () => {};
+  const onUpdateCallbacks = [];
+  const onErrorCallbacks = [];
 
   async function executeAction() {
     let response;
@@ -9,15 +9,23 @@ function Updater(action, options, interval = setInterval, stopInterval = clearIn
     try {
       response = await action();
     } catch (err) {
-      onError(err);
+      triggerOnErrorCallbacks(err);
       return;
     }
 
     if (response && response.length >= 0) {
-      response.forEach(onUpdateCallback);
+      response.forEach(triggerOnUpdateCallbacks);
     } else {
-      onUpdateCallback(response);
+      triggerOnUpdateCallbacks(response);
     }
+  }
+
+  function triggerOnUpdateCallbacks(response) {
+    onUpdateCallbacks.forEach(callback => callback(response));
+  }
+
+  function triggerOnErrorCallbacks(error) {
+    onErrorCallbacks.forEach(callback => callback(error));
   }
 
   return {
@@ -29,10 +37,10 @@ function Updater(action, options, interval = setInterval, stopInterval = clearIn
       stopInterval(intervalId);
     },
     onUpdate(callback) {
-      onUpdateCallback = callback;
+      onUpdateCallbacks.push(callback);
     },
     onError(callback) {
-      onError = callback;
+      onErrorCallbacks.push(callback);
     }
   };
 }
