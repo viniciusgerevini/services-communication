@@ -1,0 +1,28 @@
+version: '3'
+services:
+  dev:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
+    command: echo 'Golang is cool!'
+    volumes:
+      - .:/go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
+    environment:
+      - APP_ENV=$APP_ENV
+  server:
+    working_dir: /go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
+    image: golang:1.10-alpine
+    command: go run cmd/main.go
+    volumes:
+      - .:/go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
+    environment:
+      - APP_ENV=$APP_ENV
+    links:
+      - eventbus
+  eventbus:
+    build:
+      context: ../messagebus
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
