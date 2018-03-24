@@ -13,11 +13,13 @@ services:
   server:
     working_dir: /go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
     image: golang:1.10-alpine
-    command: go run cmd/main.go
+    command: go run main.go
     volumes:
       - .:/go/src/github.com/viniciusgerevini/realtime-transport-web-backend/
     environment:
       - APP_ENV=$APP_ENV
+    ports:
+      - "9292:9292"
     links:
       - eventbus
   eventbus:
