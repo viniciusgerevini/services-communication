@@ -1,8 +1,0 @@
-version: '2'
-services:
-  eventbus:
-    build:
-      context: ./messagebus
-      dockerfile: Dockerfile
-    ports:
-      - "8080:80"
