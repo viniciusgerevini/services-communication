@@ -1,8 +1,0 @@
-{
-  "messageBusHost": "http://eventbus",
-  "realtimeApi": {
-    "url": "",
-    "apiKey": "",
-    "updateInterval": 10000
-  }
-}
